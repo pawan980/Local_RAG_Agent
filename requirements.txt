@@ -1,3 +1,20 @@
+
+# Core LangChain packages
 langchain
-langchain-ollama
+langchain-core
+langchain-community
+langchain-text-splitters
 langchain-chroma
+
+# Local model + embedding support
+langchain-ollama
+
+# Vectorstore and persistence
+chromadb
+
+# Data handling
+pandas
+
+# Optional: for future use of PDFs, web loaders, etc.
+#langchain-openai
+#langchain-huggingface

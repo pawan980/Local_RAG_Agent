@@ -1,155 +1,76 @@
-# Local_RAG_Agent
-# 🧠 Local RAG Agent (LCEL)
+# 🧠 Local RAG Agent (ChromaDB + LangChain)
 
-A **local AI question-answering agent** built using **LangChain Expression Language (LCEL)**.
-It can answer user questions based on the contents of a provided file — entirely **offline**, using local models and vector search.
+A minimal **Retrieval-Augmented Generation (RAG)** system built with
+**LangChain Expression Language (LCEL)**, **ChromaDB**, and **Ollama** for fully local operation.
+It answers questions from `.txt` or `.csv` files by retrieving relevant context and generating responses via a local LLM.
 
 ---
 
 ## 🚀 Features
 
-* **Retrieval-Augmented Generation (RAG):** Answers are grounded in your document’s content.
-* **Local Execution:** Uses `Ollama` + `FAISS` + `HuggingFace` embeddings — no external API calls.
-* **Composable LCEL Pipeline:** Fully modular and extensible with LangChain Expression Language.
-* **Supports Any Text File:** Plug in `.txt`, `.md`, or even processed PDF text.
-
----
-
-## 🧩 Architecture Overview
-
-```
-        ┌─────────────┐
-        │   Document  │
-        └──────┬──────┘
-               │
-               ▼
-     ┌───────────────────┐
-     │ Text Splitter     │ → chunks for embeddings
-     └───────────────────┘
-               │
-               ▼
-     ┌───────────────────┐
-     │ Embeddings Model  │ (MiniLM)
-     └───────────────────┘
-               │
-               ▼
-     ┌───────────────────┐
-     │ Vectorstore (FAISS│
-     └───────────────────┘
-               │
-               ▼
-     ┌────────────────────────────────┐
-     │ LCEL Chain: Retriever → LLM     │
-     └────────────────────────────────┘
-```
-
----
-
-## 🛠️ Setup Instructions
-
-### 1️⃣ Clone & Install
-
-```bash
-git clone https://github.com/yourusername/local-rag-agent.git
-cd local-rag-agent
-
-pip install -r requirements.txt
-```
-
-### 2️⃣ Dependencies
-
-Ensure the following are installed:
-
-```bash
-pip install langchain langchain-community langchain-text-splitters faiss-cpu sentence-transformers langchain-ollama
-```
-
-### 3️⃣ Install Ollama and Pull a Model
-
-```bash
-brew install ollama
-ollama pull mistral
-```
-
-You can also use `llama3`, `phi3`, or any other supported model.
-
----
-
-## 📘 Usage
-
-1. Place your reference text file (e.g., `data.txt`) in the root directory.
-2. Run the agent:
-
-```bash
-python local_rag_agent.py
-```
-
-3. Start chatting:
-
-```
-🧠 Local RAG Agent (LCEL) Ready!
-Ask a question: What is this document about?
-```
-
-Type `exit` to quit.
+* 📄 Supports both `.txt` and `.csv` files
+* 🧠 Uses **ChromaDB** as a local vector database
+* 🔤 Generates **embeddings** with `OllamaEmbeddings`
+* 🤖 Answers questions using a local Ollama model (e.g. `gpt-oss:120b-cloud`, `mistral`, `llama3`, etc.)
+* ⚙️ Built with **LangChain Expression Language (LCEL)** for composable pipelines
 
 ---
 
 ## 🧱 Project Structure
 
 ```
-local-rag-agent/
+local-rag-chroma/
 │
-├── data.txt                  # Your knowledge source
-├── local_rag_agent.py        # Main RAG agent script
-├── requirements.txt          # Dependencies
-└── README.md                 # Project documentation
+├── data.txt                # or data.csv
+├── local_rag_agent.py      # main RAG agent
+├── vectorstore_utils.py    # handles text loading + vectorstore
+├── requirements.txt        # dependencies
+└── README.md
 ```
 
 ---
 
-## ⚙️ How It Works
+## ⚙️ Setup
 
-1. **Load Document:** Text is read and chunked into overlapping segments.
-2. **Embed & Index:** Each chunk is embedded using `sentence-transformers` and stored in a FAISS index.
-3. **Retrieve:** When you ask a question, top-k similar chunks are fetched.
-4. **Generate:** The retrieved chunks + question form a context-aware prompt, passed to the local LLM.
-5. **Answer:** The model outputs a grounded, contextually accurate answer.
+### 1️⃣ Install dependencies
 
----
-
-## 🧮 LCEL Chain Definition
-
-```python
-rag_chain = (
-    {"context": retriever, "question": RunnablePassthrough()}
-    | prompt
-    | llm
-    | StrOutputParser()
-)
+```bash
+pip install -r requirements.txt
 ```
 
-Each `|` represents a flow stage — retrieval → prompt → generation → parsing.
-This is the core of LangChain Expression Language.
+### 2️⃣ Install Ollama and a model
+
+```bash
+brew install ollama
+ollama pull gpt-oss:120b-cloud
+```
 
 ---
 
-## 🧠 Customization
+## 🧠 Usage
 
-* **Change Model:** Replace `mistral` with `llama3`, `phi3`, etc.
-* **Adjust Chunk Size:** Tune `chunk_size` and `chunk_overlap` for optimal context.
-* **Add Memory:** Use `ConversationBufferMemory` for contextual conversations.
-* **Add Persistence:** Swap FAISS with ChromaDB for saved indexes.
+1. Place your `.txt` or `.csv` file in the project folder.
+2. Run the agent:
+
+   ```bash
+   python local_rag_agent.py
+   ```
+3. Ask questions about your data:
+
+   ```
+   Ask a question: What is LangChain?
+   Answer: LangChain is a framework for building applications with large language models.
+   ```
 
 ---
 
-## 📈 Future Improvements
+## 🧩 How It Works
 
-* PDF & Markdown ingestion
-* Web UI (Streamlit or Gradio)
-* LangGraph integration for multi-tool reasoning
-* Persistent vectorstore cache
+1. Loads your file and splits text into chunks.
+2. Embeds chunks using OllamaEmbeddings embeddings.
+3. Stores embeddings locally in ChromaDB.
+4. Retrieves top matches for your question.
+5. Generates an answer with Ollama LLM.
 
 ---
 
-> “RAG turns language models into knowledge models — grounded, truthful, and local.”
