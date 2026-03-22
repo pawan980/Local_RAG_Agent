@@ -12,10 +12,10 @@ model = OllamaLLM(model="gpt-oss:120b-cloud", temperature=0.7)
 retriever = build_vectorstore("reviews.csv")    
 
 # Define the prompt template
-template = """You are an expert in answering questions about the pizza restaurant 
+template = """You are a helpful assistant. Answer the question based only on the provided context.
 Context: {context}
-here is the question: {question}
-Provide a detailed answer based on the reviews.
+Question: {question}
+If the answer is not found in the context, say "I don't know based on the provided documents."
 """
 
 # Create a prompt template
