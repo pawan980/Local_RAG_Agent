@@ -1,8 +1,7 @@
 # vectorstore_utils.py
 
 import os
-import pandas as pd
-from langchain_community.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader, CSVLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -10,13 +9,9 @@ from langchain.schema import Document
 
 # function to load CSV as documents
 def load_csv_as_documents(file_path: str):
-    """Convert CSV rows into Document objects for embedding."""
-    df = pd.read_csv(file_path)
-    docs = []
-    for _, row in df.iterrows():
-        row_text = " | ".join(f"{col}: {val}" for col, val in row.items())
-        docs.append(Document(page_content=row_text))
-    return docs
+    """Load .csv file into Document objects."""
+    loader = CSVLoader(file_path=file_path)
+    return loader.load()
 
 # function to load TXT as documents
 def load_text_as_documents(file_path: str):
